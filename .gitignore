@@ -1,5 +1,6 @@
 .DS_Store
 corpus/*.csv
+seen_entities.txt
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
