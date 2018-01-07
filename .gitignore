@@ -1,5 +1,5 @@
 .DS_Store
-corpus/speeches_reversed.csv
+corpus/*.csv
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
