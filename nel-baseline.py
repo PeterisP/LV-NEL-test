@@ -15,10 +15,10 @@ blacklist = set(blacklist)
 
 def prepare_entities(source, filename):
 	with open(filename, 'w') as f:
-		entities = load_entities(source)
+		entities = load_dbpedia_entities(source)
 		json.dump(list(entities), f, ensure_ascii=False, indent=2)	
 
-def load_entities(filename):
+def load_dbpedia_entities(filename):
 	with open(filename) as entityfile:
 		for line in entityfile:
 			if line.startswith('#'):
@@ -51,7 +51,7 @@ def load_entities(filename):
 			entity = Entity(name, uri, instancetype, aliases, inflections)
 			yield entity
 
-def check_entities(entities, filename):
+def check_dbpedia_entities(entities, filename):
 	entitydict = {}
 	for entity in entities:
 		if entity.name in entitydict:
