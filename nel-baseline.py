@@ -11,7 +11,7 @@ Entity = namedtuple('Entity', ['name', 'uri', 'category', 'aliases', 'inflection
 goodtypes = set(['http://schema.org/Place', 'http://schema.org/Person', 'http://schema.org/Organization'])
 
 blacklist = ['Sana','Biksi','Alva','Roli','MakSim','Peru','Oša','Doha','Reģi','Vitol','Neptūns','Igo','MaNga','Barta','Notra','Deli','Lībe','Basi','Vore','Nove','Ozols','Tuma','Auri','Dons','Modo','Uda','Aģe','Pink','Sita','Auseklis','Čada','Viktorija','3. kilometrs','Paks','Meka','A-ha','Jūta','Meks','Nē','Ēre','Kalē','Gulag','Sīpoli','Modes','Dāvi','Monro','Lins','Aima','Rudus','Aksi','Rāvi','Anastasija','Nātre','Hama','Daka','Taurene','Zeme','Elka','v','bāka','Jums']
-blacklist = ['Mūsu', 'Zemnieki', 'Vars']
+blacklist = ['Mūsu', 'Zemnieki', 'Vars', 'Vads', 'Tempa', 'Zāle', 'Kara', 'Joma', 'Gata', 'Sava', 'Terors']
 blacklist = set(blacklist)
 
 def prepare_entities(source, filename):

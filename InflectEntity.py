@@ -25,7 +25,7 @@ inflection_webservice = {
 def inflectEntity(name, category):
     # Nekonkretajam personu entitijam forma "Arvids (Petera Vaska tevs)" locijumos liekam tikai to dalu, kas ir arpus iekavam
     if category == 'person':
-        match = re.match(r'([A-ZACEGIKLNŠUŽ]\w+) \(.*\)', name, re.UNICODE)
+        match = re.match(r'([A-ZĀČĒĢĪĶĻŅŠŪŽ]\w+) \(.*\)', name, re.UNICODE)
         if match:
             name = match.group(1)
 
@@ -39,7 +39,7 @@ def inflectEntity(name, category):
 def normalizeEntity(name, category):
     # Nekonkretajam personu entitijam forma "Arvids (Petera Vaska tevs)" locijumos liekam tikai to dalu, kas ir arpus iekavam
     if category == 'person':
-        match = re.match(r'([A-ZACEGIKLNŠUŽ]\w+) \(.*\)', name, re.UNICODE)
+        match = re.match(r'([A-ZĀČĒĢĪĶĻŅŠŪŽ]\w+) \(.*\)', name, re.UNICODE)
         if match:
             name = match.group(1)
 
