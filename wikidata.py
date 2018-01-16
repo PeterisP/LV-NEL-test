@@ -8,7 +8,12 @@ wikidata_folder = '../'
 instancetype_filename = 'wikidatawiki-20180101-instance-types-transitive.ttl'
 labels_filename = 'wikidatawiki-20180101-labels.ttl'
 goodtypes = set(['http://schema.org/Place', 'http://schema.org/Person', 'http://schema.org/Organization'])
-badtypes = set(['http://wikidata.dbpedia.org/resource/Q41176', 'http://wikidata.dbpedia.org/resource/Q8928', 'http://wikidata.dbpedia.org/resource/Q532'])
+badtypes = set(['http://www.wikidata.org/entity/Q41176', # building
+				'http://www.wikidata.org/entity/Q8928', # constellation
+				'http://www.wikidata.org/entity/Q532', # village
+				'http://dbpedia.org/ontology/CelestialBody',
+				'http://www.wikidata.org/entity/Q532',   # train station
+				])
 
 def load_wikidata_types(filename):
 	entity_types = {}
@@ -26,7 +31,6 @@ def load_wikidata_types(filename):
 				continue
 			if instancetype in badtypes:
 				bad_entities.add(entity_id)
-				print(uri, instancetype)
 				if entity_types.get(entity_id):
 					del entity_types[entity_id] 
 				continue
