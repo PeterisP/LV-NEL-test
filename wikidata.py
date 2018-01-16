@@ -26,6 +26,7 @@ def load_wikidata_types(filename):
 				continue
 			if instancetype in badtypes:
 				bad_entities.add(entity_id)
+				print(uri, instancetype)
 				if entity_types.get(entity_id):
 					del entity_types[entity_id] 
 				continue
@@ -91,7 +92,7 @@ def inflect_entities(entities):
 	return entities
 
 entity_types = load_wikidata_types(wikidata_folder+instancetype_filename)
-with open('wikidata/entities_noinflect.json', 'w') as f:
+with open('wikidata/entities_noinflect.json', 'w', encoding='utf-8') as f:
 	entities = load_wikidata_entities(wikidata_folder+labels_filename, entity_types)
 	json.dump(list(entities), f, ensure_ascii=False, indent=2)	
 
