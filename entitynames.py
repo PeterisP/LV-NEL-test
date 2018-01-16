@@ -8,11 +8,11 @@ def fixName(name):
 
 def personAliases(name):
     insertalias = [name] 
-    if re.match(r'[A-ZĀČĒĢĪĶĻŅŠŪŽ]\w+ [A-ZČĒĢĪĶĻŅŠŪŽ]\w+$', name, re.UNICODE):
-        extra_alias = re.sub(r'([A-ZČĒĢĪĶĻŅŠŪŽ])\w+ ', r'\1. ', name, flags=re.UNICODE )
+    if re.match(r'[A-ZĀČĒĢĪĶĻŅŠŪŽ]\w+ [A-ZĀČĒĢĪĶĻŅŠŪŽ]\w+$', name, re.UNICODE):
+        extra_alias = re.sub(r'([A-ZĀČĒĢĪĶĻŅŠŪŽ])\w+ ', r'\1. ', name, flags=re.UNICODE )
         if not extra_alias in insertalias:
             insertalias.append(extra_alias)
-        extra_alias = re.sub(r'([A-ZČĒĢĪĶĻŅŠŪŽ])\w+ ', r'\1.', name, flags=re.UNICODE )
+        extra_alias = re.sub(r'([A-ZĀČĒĢĪĶĻŅŠŪŽ])\w+ ', r'\1.', name, flags=re.UNICODE )
         if not extra_alias in insertalias:
             insertalias.append(extra_alias)
     return insertalias

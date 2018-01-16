@@ -8,18 +8,30 @@ wikidata_folder = '../'
 instancetype_filename = 'wikidatawiki-20180101-instance-types-transitive.ttl'
 labels_filename = 'wikidatawiki-20180101-labels.ttl'
 goodtypes = set(['http://schema.org/Place', 'http://schema.org/Person', 'http://schema.org/Organization'])
+badtypes = set(['http://wikidata.dbpedia.org/resource/Q41176', 'http://wikidata.dbpedia.org/resource/Q8928', 'http://wikidata.dbpedia.org/resource/Q532'])
 
 def load_wikidata_types(filename):
 	entity_types = {}
+	bad_entities = set()	
 	with open(filename) as entityfile:
 		for line in entityfile:
 			if line.startswith('#'):
 				continue
 			uri, _, instancetype = re.findall(r'<([^>]+)>', line)
-			if instancetype not in goodtypes:
-				continue
+
 			assert uri.startswith('http://wikidata.dbpedia.org/resource/Q')
 			entity_id = uri[37:]		
+
+			if entity_id in bad_entities:
+				continue
+			if instancetype in badtypes:
+				bad_entities.add(entity_id)
+				if entity_types.get(entity_id):
+					del entity_types[entity_id] 
+				continue
+
+			if instancetype not in goodtypes:
+				continue
 
 			category = ''
 			if 'Person' in instancetype:
@@ -50,7 +62,7 @@ def load_wikidata_entities(filename, entity_types):
 			entity_id = uri[37:]
 
 			category = entity_types.get(entity_id)
-			if category == None:
+			if category == None: # tātad nebija labo tipu sarakstos
 				continue
 
 			entity = entities.get(entity_id)
