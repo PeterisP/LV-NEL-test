@@ -62,7 +62,8 @@ def inflect_entities(entities):
 		for alias in entity.aliases:
 			new_aliases, inflections = get_inflection_aliases(alias, entity.category)
 			aliases |= new_aliases
-		new_entity = Entity(entity.name, entity.uri, entity.category, list(aliases), inflections)
+		uri = entity.uri.replace('wikidata.dbpedia.org/resource', 'www.wikidata.org/entity')
+		new_entity = Entity(entity.name, uri, entity.category, list(aliases), inflections)
 		yield new_entity
 
 def check_dbpedia_entities(entities, filename):
@@ -132,7 +133,7 @@ with open(corpus_filename) as corpusfile:
 				entity = entities_by_name.get(pattern)
 				if entity.name in blacklist:
 					continue
-				if entity.category == 'person' and ' ' not in entity.name:
+				if entity.category == 'person' and ' ' not in pattern and '.' not in pattern:
 					continue
 				seen_entities.add(entity.name)
 				mentions.append( (pattern, entity.name, start_idx, entity.uri, entity.category) )
