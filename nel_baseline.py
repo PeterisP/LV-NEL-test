@@ -1,3 +1,6 @@
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
+
 # Full-text search of entity alternate names within the corpus.
 # No disambiguation
 
@@ -11,7 +14,7 @@ Entity = namedtuple('Entity', ['name', 'uri', 'category', 'aliases', 'inflection
 goodtypes = set(['http://schema.org/Place', 'http://schema.org/Person', 'http://schema.org/Organization'])
 
 blacklist = ['Sana','Biksi','Alva','Roli','MakSim','Peru','Oša','Doha','Reģi','Vitol','Neptūns','Igo','MaNga','Barta','Notra','Deli','Lībe','Basi','Vore','Nove','Ozols','Tuma','Auri','Dons','Modo','Uda','Aģe','Pink','Sita','Auseklis','Čada','Viktorija','3. kilometrs','Paks','Meka','A-ha','Jūta','Meks','Nē','Ēre','Kalē','Gulag','Sīpoli','Modes','Dāvi','Monro','Lins','Aima','Rudus','Aksi','Rāvi','Anastasija','Nātre','Hama','Daka','Taurene','Zeme','Elka','v','bāka','Jums']
-blacklist = ['Mūsu', 'Zemnieki', 'Vars', 'Vads', 'Tempa', 'Zāle', 'Kara', 'Joma', 'Gata', 'Sava', 'Terors']
+blacklist += ['Mūsu', 'Zemnieki', 'Vars', 'Vads', 'Tempa', 'Zāle', 'Kara', 'Joma', 'Gata', 'Sava', 'Terors','Va']
 blacklist = set(blacklist)
 
 def prepare_entities(source, filename):
@@ -86,11 +89,6 @@ def check_dbpedia_entities(entities, filename):
 				pass
 
 entity_source = 'dbpedia/instance_types_transitive_lv.ttl'
-# entity_filename = 'dbpedia/entities.json'
-entity_filename_noinflect = 'wikidata/entities_noinflect.json'
-entity_filename = 'wikidata/entities.json'
-corpus_filename = 'corpus/speeches_reversed.csv'
-output_filename = 'corpus/speeches_reversed_entities.csv'
 
 # prepare_entities(entity_source, entity_filename)
 def inflect_entity_file():
@@ -101,51 +99,75 @@ def inflect_entity_file():
 			json.dump(list(entities), f, ensure_ascii=False, indent=2)	
 	print('Entities inflected..')
 
-# inflect_entity_file()
 
-with open(entity_filename) as f:
-	entities = [Entity._make(entity) for entity in json.load(f)]
+def load_entity_data(entity_filename):
+	with open(entity_filename) as f:
+		entities = [Entity._make(entity) for entity in json.load(f)]
 
-# check_entities(entities, entity_filename)
-entity_names = [name for entity in entities for name in entity.aliases]
-entities_by_name = {name : entity for entity in entities for name in entity.aliases}
-seen_entities = set()
-trie = TrieSearch(entity_names, splitter='')
+	# check_entities(entities, entity_filename)
+	entity_names = [name for entity in entities for name in entity.aliases]
+	entities_by_name = {name : entity for entity in entities for name in entity.aliases}
+	trie = TrieSearch(entity_names, splitter='')
 
-print('processing corpus....')
-with open(corpus_filename) as corpusfile:
-	with open(output_filename, 'w', newline='') as outfile:
-		corpusreader = csv.reader(corpusfile)
-		outwriter = csv.writer(outfile)
-		next(corpusreader)
-		outwriter.writerow(['type', 'source', 'session_name', 'session_type', 'date', 'id', 'speaker', 'category', 'subcategory', 'role', 'sequence', 'text', 'entities'])
-		for row in corpusreader:
-			text = row[11]
-			text = text.replace('\n',' ')
-			text = fixName(text)
+	return trie, entities_by_name
 
-			mentions = []
-			for pattern, start_idx in trie.search_all_patterns(text):
-				if start_idx+len(pattern)<len(text) and text[(start_idx+len(pattern))].isalpha(): # ja nākamais simbols aiz vārda ir burts, tad izlaižam - lai nav vārdu daļas.
-					continue
-				if pattern in blacklist:
-					continue
-				entity = entities_by_name.get(pattern)
-				if entity.name in blacklist:
-					continue
-				if entity.category == 'person' and ' ' not in pattern and '.' not in pattern:
-					continue
-				seen_entities.add(entity.name)
-				mentions.append( (pattern, entity.name, start_idx, entity.uri, entity.category) )
-			row.append(json.dumps(mentions, ensure_ascii=False))
-			outwriter.writerow(row)
+def do_nel(trie, entities_by_name, text):
+	text = text.replace('\n',' ')
+	text = fixName(text)
+	mentions = []
+	for pattern, start_idx in trie.search_all_patterns(text):
+		if start_idx+len(pattern)<len(text) and text[(start_idx+len(pattern))].isalpha(): # ja nākamais simbols aiz vārda ir burts, tad izlaižam - lai nav vārdu daļas.
+			continue
+		if pattern in blacklist:
+			continue
+		entity = entities_by_name.get(pattern)
+		if entity.name in blacklist:
+			continue
+		if entity.category == 'person' and ' ' not in pattern and '.' not in pattern:
+			continue
+		mentions.append( (pattern, entity.name, start_idx, entity.uri, entity.category) )
+	return mentions
 
-with open('seen_entities.txt', 'w') as f:
-	for name in seen_entities:
-		entity = entities_by_name.get(name)
-		if entity:
-			f.write(f'{entity.category} {entity.name}\n')
-		else:
-			f.write(f'{name}\n')
 
-print('Done')
+def parse_corpus(trie, entities_by_name):
+	# entity_filename = 'dbpedia/entities.json'
+	# entity_filename_noinflect = 'wikidata/entities_noinflect.json'
+	# inflect_entity_file()
+	corpus_filename = 'corpus/speeches_reversed.csv'
+	output_filename = 'corpus/speeches_reversed_entities.csv'
+
+	print('processing corpus....')
+	seen_entities = set()
+	with open(corpus_filename) as corpusfile:
+		with open(output_filename, 'w', newline='') as outfile:
+			corpusreader = csv.reader(corpusfile)
+			outwriter = csv.writer(outfile)
+			next(corpusreader)
+			outwriter.writerow(['type', 'source', 'session_name', 'session_type', 'date', 'id', 'speaker', 'category', 'subcategory', 'role', 'sequence', 'text', 'entities'])
+			for row in corpusreader:
+				text = row[11]
+
+				mentions = do_nel(trie, entities_by_name, text)
+				for mention in mentions:
+					seen_entities.add(mention.get(1))
+
+				row.append(json.dumps(mentions, ensure_ascii=False))
+				outwriter.writerow(row)
+
+	with open('seen_entities.txt', 'w') as f:
+		for name in seen_entities:
+			entity = entities_by_name.get(name)
+			if entity:
+				f.write(f'{entity.category} {entity.name}\n')
+			else:
+				f.write(f'{name}\n')
+
+if __name__ == "__main__":
+    # execute only if run as a script
+
+	entity_filename = 'wikidata/entities.json'
+	trie, entities_by_name = load_entity_data(entity_filename)
+	parse_corpus(trie, entities_by_name)
+
+	print('Done')
+

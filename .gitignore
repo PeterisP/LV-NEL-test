@@ -1,7 +1,9 @@
 .DS_Store
 corpus/*.csv
+corpus/*.tgz
 seen_entities.txt
 *.bz2
+wikidata/*.ttl
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
