@@ -1,0 +1,4 @@
+corpus/
+dbpedia/
+wikidata/*.ttl
+wikidata/*.bz2
