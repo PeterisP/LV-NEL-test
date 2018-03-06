@@ -3,7 +3,7 @@ corpus/*.csv
 corpus/*.tgz
 seen_entities.txt
 *.bz2
-wikidata/*.ttl
+*.ttl
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
